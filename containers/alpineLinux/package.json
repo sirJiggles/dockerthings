@@ -1,0 +1,10 @@
+{
+  "name": "app-two",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@hapi/hapi": "^19.1.1",
+    "hapi-pino": "^8.0.1"
+  }
+}
