@@ -69,3 +69,17 @@ you need to tell docker you would like for example to map one of its ports to th
 like so
 
 - docker run --publish 3000:3000 NAME
+
+### Bind mounts
+
+This command will
+
+- allow docker to take your files where you are
+- bind them to a directory in the container
+- expose to 8080 the docker port 80 (nginx)
+- run that on the nginx container ....
+- when you make changes on the host machine to say the web files in this case they will be reflected on the docker container also
+
+`docker run --mount type=bind,source="$(pwd)"/build,target=/usr/share/nginx/html -p 8080:80 nginx:stable`
+
+But this is not such a great idea for production obv as you cannot just throw this about like you can the standard containers
