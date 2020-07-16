@@ -1,7 +1,19 @@
+# Build time stage, at this point we will use node 12 stretch to just get
+# the packages and copy all the things over
+FROM node:12-stretch as build
+# We can just do this as root now as we will switch user later
+WORKDIR /build
+COPY package-lock.json package.json ./
+RUN npm ic
+COPY . .
+
+# Runtime stage, what we will actually run in the end. we want this
+# nice and small
 FROM alpine:3.10
 
-# Alpine package manager (update first) get node and npm
-RUN apk add --update nodejs npm
+# Alpine package manager (update first) get node, we don't need NPM now
+# as we used it already in the build stage for getting the packages
+RUN apk add --update nodejs
 
 # Add a user called node in the group node
 RUN addgroup -S node && adduser -S node -G node
@@ -11,20 +23,9 @@ USER node
 
 # so we own the dir
 RUN mkdir /home/node/code
-
 WORKDIR /home/node/code
 
-# copy the package and the lock file, then run yarn. This means
-# if the code changes later then we can use the modules
-# from the cache and not re-download them all the time if no
-# node modules where changed
-COPY --chown=node:node package-lock.json package.json ./
-
-# Install all the deps, ic is from lock file
-RUN npm ic
-
-# Copy everything form here to there
-COPY --chown=node:node . .
-
+# Now we can grab the files that we made in build, when we needed npm
+COPY --from=build --chown=node:node /build .
 
 CMD [ "node",  "index.js" ]
